@@ -35,10 +35,6 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-//    public User(String username) {
-//        this.username = username;
-//    }
-
     public Long getId() {
         return id;
     }

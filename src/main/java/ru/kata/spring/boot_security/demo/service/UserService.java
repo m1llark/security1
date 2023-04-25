@@ -22,16 +22,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-@Transactional
+
 @Service
 public class UserService implements UserDetailsService{
+    private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
 
     @Override
@@ -46,8 +47,6 @@ public class UserService implements UserDetailsService{
 
 
     public User loadUserById(Long id) {
-//        Optional<User> user = userRepository.findById(userId);
-//        return user.orElse(null);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
         return user;
@@ -58,17 +57,7 @@ public class UserService implements UserDetailsService{
     }
 
 
-//    public void register(User user) {
-//        if (user.getUsername().equals("admin")) {
-//            user.setRoles(Set.of(new Role("ROLE_ADMIN"),(new Role("ROLE_USER"))));
-//        }
-//        else {
-//            user.setRoles(Collections.singleton(new Role("ROLE_USER")));
-//
-//        }
-//        user.setPassword(passwordEncoder.encode(user.getPassword()));
-//        userRepository.save(user);
-//    }
+    @Transactional
     public void register(User user) {
         if (user.getUsername().equals("admin")) {
             user.setRoles(Set.of(new Role("ROLE_ADMIN"),(new Role("ROLE_USER"))));
@@ -81,7 +70,7 @@ public class UserService implements UserDetailsService{
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
-
+    @Transactional
     public boolean removeUserById(Long userId) {
         if (userRepository.findById(userId).isPresent()) {
             userRepository.deleteById(userId);

@@ -17,46 +17,23 @@ import ru.kata.spring.boot_security.demo.service.UserService;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private final UserService userService;
+
+    private final SuccessUserHandler successUserHandler;
+
+    private final PasswordEncoder passwordEncoder;
     @Autowired
-    private  UserService userService;
+    public WebSecurityConfig(UserService userService, SuccessUserHandler successUserHandler, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
+        this.successUserHandler = successUserHandler;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-    @Autowired
-    private SuccessUserHandler successUserHandler;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-
-
-
-
-//    @Bean
-//    public PasswordEncoder getPasswordencoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-
-
-
-//    protected void configure(HttpSecurity http) throws Exception {
-//        http.authorizeRequests()
-//                .antMatchers("/admin").hasRole("ADMIN")
-//                .antMatchers("/auth/login","/auth/registration", "/error").permitAll()
-//                .anyRequest().hasAnyRole("USER","ADMIN")
-//                .and()
-//                .formLogin().loginPage("/auth/login")
-//                .loginProcessingUrl("/process_login")
-//                .defaultSuccessUrl("/hello", true)
-//                .failureUrl("/auth/login?error")
-//                .and()
-//                .logout()
-//                .logoutUrl("/logout")
-//                .logoutSuccessUrl("/auth/login");
-//    }
 
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-//                .antMatchers("/admin/login","/admin/registration", "/error").permitAll()
+                .antMatchers("/admin/login","/admin/registration", "/error").permitAll()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/user").hasAnyRole("ADMIN","USER")
                 .and()
@@ -67,9 +44,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll();
     }
 
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.userDetailsService(userService).passwordEncoder(getPasswordencoder());
-//    }
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userService).passwordEncoder(passwordEncoder);
 
